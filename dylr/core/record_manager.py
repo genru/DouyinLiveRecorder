@@ -10,15 +10,21 @@ from dylr.util import logger
 rooms = []
 recordings = []
 
-
+"""
+get all rooms
+"""
 def get_rooms() -> list:
     return rooms
 
-
+"""
+get all auto record rooms
+"""
 def get_auto_record_rooms() -> list:
     return [room for room in rooms if room.auto_record and '将会在开播时获取' not in str(room.room_id)]
 
-
+"""
+get all monitoring rooms
+"""
 def get_monitor_rooms() -> list:
     res = [room for room in rooms if room.auto_record and not room.important and '将会在开播时获取' not in str(room.room_id)]
     for rec in recordings:

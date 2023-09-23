@@ -81,6 +81,7 @@ def check_dependencies():
     has_requests = True
     has_websocket = True
     has_protobuf = True
+    has_flask = True
     try:
         import requests
     except:
@@ -93,6 +94,10 @@ def check_dependencies():
         import google.protobuf
     except:
         has_protobuf = False
+    try:
+        import Flask
+    except:
+        has_flask = False
 
     if has_requests and has_websocket and has_protobuf:
         return True
@@ -103,6 +108,8 @@ def check_dependencies():
         res.append('websocket-client')
     if not has_protobuf:
         res.append('protobuf')
+    if not has_flask:
+        res.append('flask')
 
     if win_mode:
         if sys.platform == 'win32':

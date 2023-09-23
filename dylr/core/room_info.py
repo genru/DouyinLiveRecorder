@@ -27,7 +27,8 @@ class RoomInfo:
         """ 直播流地址 """
         if not self.room_json or 'stream_url' not in self.room_json:
             return None
-        return self.room_json['stream_url']['flv_pull_url']['FULL_HD1']
+        # return self.room_json['stream_url']['flv_pull_url']['FULL_HD1']
+        return self.room_json['stream_url']['flv_pull_url']['SD1']
 
     def get_nick_name(self):
         """ 主播名 """

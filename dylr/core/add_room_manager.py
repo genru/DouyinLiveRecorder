@@ -10,7 +10,11 @@ import time
 import threading
 import traceback
 from functools import partial
-from tkinter import messagebox
+
+try:
+    from tkinter import messagebox
+except:
+    print('ignore')
 
 import requests
 
@@ -73,7 +77,7 @@ def find_by_web_rid(web_rid):
 
     if name is None or len(name) == 0:
         raise Exception()
-    room = Room(web_rid, name, True, True, False)
+    room = Room(web_rid, name, True, False, False)
     record_manager.rooms.append(room)
     config.save_rooms()
 
@@ -102,7 +106,7 @@ def find_user(info: str):
     if web_rid is not None:
         find_by_web_rid(web_rid)
     else:
-        room = Room(f"将会在开播时获取{random.randint(1, 100000000)}", nickname, True, True, False, sec_user_id)
+        room = Room(f"将会在开播时获取{random.randint(1, 100000000)}", nickname, True, False, False, sec_user_id)
         record_manager.rooms.append(room)
         config.save_rooms()
         if app.win_mode:

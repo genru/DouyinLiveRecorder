@@ -1,9 +1,10 @@
 /.idea
-/venv
-*/__pycache__
+/.venv
+**/__pycache__
 /logs
 /download
 /dylr/test
 /dylr/old/
 forum.MD
+rooms.json
 rooms - bak.json

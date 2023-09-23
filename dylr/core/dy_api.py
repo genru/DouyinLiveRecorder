@@ -25,7 +25,9 @@ def find_stream_url(room):
     json_info = get_live_state_json(room.room_id)
     if json_info is None:
         return None
-    stream_url = json_info['stream_url']['flv_pull_url']['FULL_HD1']
+    # stream_url = json_info['stream_url']['flv_pull_url']['FULL_HD1']
+    stream_url = json_info['stream_url']['flv_pull_url']['SD1']
+    logger.debug(stream_url)
     return stream_url
 
 

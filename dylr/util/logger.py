@@ -9,7 +9,7 @@ import time
 import os.path
 import logging
 import traceback
-
+from flask.logging import default_handler
 from dylr.core import config, app
 
 now = time.localtime()
@@ -26,6 +26,7 @@ instance.setLevel(logging.INFO)
 handler = logging.FileHandler(filename, encoding='utf-8')
 handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 instance.addHandler(handler)
+instance.addHandler(default_handler)
 
 
 def log_uncaught_exceptions(ex_cls, ex, tb):
