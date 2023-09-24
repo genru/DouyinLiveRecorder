@@ -128,6 +128,7 @@ def start_recording(room, browser=None, filename=None, stream_url=None):
         rec.stop()
 
     t = Thread(target=download)
+    app.threads.append(t)
     t.start()
 
     # if room.record_danmu:

@@ -87,7 +87,9 @@ def find_by_web_rid(web_rid):
         messagebox.askokcancel("添加主播成功", f"房间Web_Sid: {web_rid} \n 主播名: {name}")
 
     # 添加完房间立刻检查是否开播
-    threading.Thread(target=partial(monitor.check_room, room)).start()
+    t = threading.Thread(target=partial(monitor.check_room, room))
+    app.threads.append(t)
+    t.start()
 
 
 def find_short(info):

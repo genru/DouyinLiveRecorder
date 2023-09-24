@@ -4,7 +4,7 @@ import traceback
 from typing import Optional
 
 from dylr.plugin import plugin
-from dylr.core import dy_api, record_manager
+from dylr.core import dy_api, record_manager, app
 from dylr.core.danmu_recorder import DanmuRecorder
 from dylr.core.room import Room
 from dylr.core.room_info import RoomInfo
@@ -64,13 +64,16 @@ class Recording:
         if self.video_recorder is not None:
             return
         self.video_recorder = VideoRecorder(self.room, self.room_info, self)
-        threading.Thread(target=self.video_recorder.start_recording, args=(filename,)).start()
+        t = threading.Thread(target=self.video_recorder.start_recording, args=(filename,))
+        app.threads.append(t)
+        t.start()
 
     def start_recording_danmu(self, start_time):
         if self.danmu_recorder is not None:
             return
         self.danmu_recorder = DanmuRecorder(self.room, self.room_info.get_real_room_id(), start_time)
         t = threading.Thread(target=self.danmu_recorder.start)
+        app.threads.append(t)
         t.setDaemon(True)
         t.start()
 

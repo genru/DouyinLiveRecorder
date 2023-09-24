@@ -10,7 +10,7 @@ import subprocess
 import threading
 from threading import Thread
 
-from dylr.core import config
+from dylr.core import config, app
 from dylr.util import logger
 from dylr.util.ffmpeg_utils import FFMpegUtils
 
@@ -22,6 +22,7 @@ lock = threading.Lock()
 def start_transcode(filename: str):
     logger.info_and_print(f'已将 {filename} 加入转码队列')
     t = Thread(target=transcode, args=(filename,))
+    app.threads.append(t)
     t.start()
 
 
@@ -34,6 +35,11 @@ def transcode(filename: str):
         return
 
     logger.info_and_print(f'开始对 {filename} 转码')
+    if not os.path.exists(filename):
+        logger.info_and_print(f'{filename} does not exist')
+        lock.release()
+        return
+
     ffmpeg = FFMpegUtils()
     ffmpeg.input_file(filename)
     output_name = filename[0:filename.rindex('.')] + '.mp4'

@@ -11,6 +11,7 @@ import sys
 import logging
 import platform
 import threading
+import atexit
 
 from dylr.core import version, config, record_manager, monitor
 from dylr.util import logger
@@ -20,14 +21,17 @@ win_mode = False
 win = None
 # 处理 ctrl+c
 stop_all_threads = False
-
+threads = []
 
 def init(gui_mode: bool):
     global win_mode
+    global threads
+
     win_mode = gui_mode
     # 处理 ctrl+c
-    signal.signal(signal.SIGINT, sigint_handler)
-    signal.signal(signal.SIGTERM, sigint_handler)
+    # signal.signal(signal.SIGINT, sigint_handler)
+    # signal.signal(signal.SIGTERM, sigint_handler)
+    atexit.register(app_onexit)
 
     if not check_dependencies():
         return
@@ -54,6 +58,7 @@ def init(gui_mode: bool):
 
     if gui_mode:
         t = threading.Thread(target=monitor.init)
+        threads.append(t)
         t.start()
         start_gui()
     else:
@@ -72,8 +77,22 @@ def start_gui():
 
 def sigint_handler(signum, frame):
     global stop_all_threads
+    global threads
+    if threads is None: threads = []
     stop_all_threads = True
     logger.fatal_and_print('catched SIGINT(Ctrl+C) signal')
+    for t in threads:
+        t.join()
+    plugin.on_close()
+
+def app_onexit():
+    global stop_all_threads
+    global threads
+    if threads is None: threads = []
+    stop_all_threads = True
+    logger.fatal_and_print(f'app exiting... threads: %s' %len(threads))
+    # for t in threads:
+    #     t.join()
     plugin.on_close()
 
 

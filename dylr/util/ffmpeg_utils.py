@@ -332,6 +332,73 @@ class FFMpegUtils:
         """
         self._t = t
 
+    def command(self) -> []:
+        res = ['ffmpeg']
+        # input fps
+        if self._input_fps is not None:
+            res.append( f'-r {self._input_fps}')
+        # input files
+        if not self._filelist_mode and not self._input:
+            raise Exception('缺少输入文件')
+        if self._concat_mode:
+            if self._filelist_mode:
+                res.append(f'-f concat -i "{self._filelist_name}" ')
+            else:
+                res.append('-i "concat:')
+                for i in self._input:
+                    res.append(f"'{i}'|")
+                res = res.strip('|') + '" '
+        else:
+            for file in self._input:
+                res.append(f'-i "{file}" ')
+        # codec
+        if self._codec is not None:
+            res.append(f'-c {self._codec} ')
+        if self._video_codec is not None:
+            res.append(f'-c:v {self._video_codec} ')
+        if self._audio_codec is not None:
+            res.append(f'-c:a {self._audio_codec} ')
+        # bit rate
+        if self._bit_rate is not None:
+            res.append(f'-b {self._bit_rate} ')
+        if self._video_bit_rate is not None:
+            res.append(f'-b:v {self._video_bit_rate} ')
+        if self._audio_bit_rate is not None:
+            res.append(f'-b:a {self._audio_bit_rate} ')
+        # audio sampling rate
+        if self._audio_sampling_rate is not None:
+            res.append(f'-ar {self._audio_sampling_rate} ')
+        # -ss and -t
+        if self._ss is not None:
+            res.append(f'-ss {self._ss} ')
+        if self._t is not None:
+            res.append(f'-t {self._t} ')
+        # video filter
+        vf = self.video_filters().generate()
+        if vf != '':
+            res.append(f'-vf "{vf}" ')
+        # audio filter
+        af = self.audio_filters().generate()
+        if af != '':
+            res.append(f'-af "{af}" ')
+        # output fps
+        if self._output_fps is not None:
+            res.append(f'-r {self._output_fps} ')
+        # override
+        if self._override:
+            res.append('-y ')
+        # no video or audio
+        if self._no_video:
+            res.append('-vn ')
+        if self._no_audio:
+            res.append('-an ')
+        # output file
+        if self._output_name is None:
+            raise Exception('未设置输出文件名')
+        res.append(self._output_name)
+
+        return res
+
     def generate(self) -> str:
         """
         生成命令行指令

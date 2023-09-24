@@ -7,7 +7,6 @@
 """
 from dylr.util import logger
 import dylr.core.record_manager
-from dylr.core import flask
 
 
 def on_open(gui: bool):
@@ -15,9 +14,6 @@ def on_open(gui: bool):
      软件刚启动时
      :param gui: 是否以GUI形式启动
     """
-    if not gui:
-        logger.info('on open')
-        dylr.core.flask.start_server()
     ...
 
 
@@ -34,7 +30,6 @@ def on_close():
     软件关闭时
     若强制关闭可能不会触发
     """
-    dylr.core.flask.stop_server();
     ...
 
 

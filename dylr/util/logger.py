@@ -26,7 +26,7 @@ instance.setLevel(logging.INFO)
 handler = logging.FileHandler(filename, encoding='utf-8')
 handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 instance.addHandler(handler)
-instance.addHandler(default_handler)
+# instance.addHandler(default_handler)
 
 
 def log_uncaught_exceptions(ex_cls, ex, tb):

@@ -27,21 +27,23 @@ def init():
 
     start_thread()
 
-    while True:
-        time.sleep(0.1)
-        if app.stop_all_threads:
-            time.sleep(1)  # 给时间让其他线程结束
-            break
+    # while True:
+    #     time.sleep(0.1)
+    #     if app.stop_all_threads:
+    #         time.sleep(1)  # 给时间让其他线程结束
+    #         break
 
 
 def start_thread():
     # 启动主检测线程
     t = Thread(target=check_thread_main)
+    app.threads.append(t)
     t.setDaemon(True)
     t.start()
 
     # 没有 web_rid 的主播
     t = Thread(target=rooms_without_web_rid_thread)
+    app.threads.append(t)
     t.setDaemon(True)
     t.start()
 
@@ -54,6 +56,7 @@ def start_thread():
 
 def start_important_monitor_thread(room):
     t = Thread(target=important_monitor, args=(room,))
+    app.threads.append(t)
     t.setDaemon(True)
     t.start()
 
@@ -152,7 +155,9 @@ def rooms_without_web_rid_thread():
                 if app.win_mode:
                     app.win.add_room(room)
                 config.save_rooms()
-            threading.Thread(target=check_room, args=(room,)).start()
+            t = threading.Thread(target=check_room, args=(room,))
+            app.threads.append(t)
+            t.start()
             time.sleep(config.get_check_period())
         time.sleep(config.get_check_wait_time())
 
