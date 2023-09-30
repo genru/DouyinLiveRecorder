@@ -16,12 +16,14 @@ import atexit
 from dylr.core import version, config, record_manager, monitor
 from dylr.util import logger
 from dylr.plugin import plugin
+from flaskr.client import Worker
 
 win_mode = False
 win = None
 # 处理 ctrl+c
 stop_all_threads = False
 threads = []
+worker = None
 
 def init(gui_mode: bool):
     global win_mode
@@ -55,6 +57,11 @@ def init(gui_mode: bool):
     record_manager.rooms = config.read_rooms()
 
     plugin.on_loaded(gui_mode)
+
+    """ start client """
+    global worker;
+    worker = Worker('client 1', 'ws://localhost:8080')
+    worker.start()
 
     if gui_mode:
         t = threading.Thread(target=monitor.init)
@@ -92,7 +99,7 @@ def app_onexit():
     stop_all_threads = True
     logger.fatal_and_print(f'app exiting... threads: %s' %len(threads))
     # for t in threads:
-    #     t.join()
+        # t.join()
     plugin.on_close()
 
 

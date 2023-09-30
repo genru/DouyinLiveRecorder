@@ -2,15 +2,17 @@ import os
 from flask import Flask, jsonify, request
 from dylr.core import app as dylr_app, add_room_manager, transcode_manager
 from flaskr import route
+from flaskr.client import Worker
 # from dylr.core import add_room_manager, record_manager
 
+worker = None
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        # DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
 
     if test_config is None:
@@ -33,4 +35,9 @@ def create_app(test_config=None):
 
     """ initialize dylr modules """
     dylr_app.init(False)
+
+    """ start client """
+    global worker;
+    worker = Worker('client 1', 'ws://localhost:8080')
+    worker.start()
     return app

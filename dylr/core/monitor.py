@@ -27,11 +27,11 @@ def init():
 
     start_thread()
 
-    # while True:
-    #     time.sleep(0.1)
-    #     if app.stop_all_threads:
-    #         time.sleep(1)  # 给时间让其他线程结束
-    #         break
+    while True:
+        time.sleep(0.5)
+        if app.stop_all_threads:
+            time.sleep(1)  # 给时间让其他线程结束
+            break
 
 
 def start_thread():
@@ -89,6 +89,8 @@ def check_thread_main():
         logger.info_and_print('检测房间列表为空')
     global check_rooms_queue
     while True:
+        if app.stop_all_threads:
+            break
         # logger.debug_and_print('new task for checking')
         check_rooms_queue = record_manager.get_monitor_rooms()
         check_rooms_queue.reverse()
