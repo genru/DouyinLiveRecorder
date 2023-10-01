@@ -4,6 +4,7 @@ import threading
 import json
 import time
 from dylr.core import add_room_manager, app
+from dylr.util import logger
 
 class Worker:
     def __init__(self, name, server_url, max_task_limit=10):
@@ -78,10 +79,29 @@ class Worker:
             print(f'Task queue is full. Task "{task}" not added.')
 
     def on_task_started(self, task):
-        print(f'Task started: {task}')
+        # print(f'Task started: {task}')
+        logger.info_and_print(f'Task started: {task}')
+        rid = task['id']
+        # logger.info_and_print(f'Task started: {rid}')
+        if self.ws and self.ws.sock and self.ws.sock.connected:
+            # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
+            taskstart_message = json.dumps({'type': 'taskstart', 'task':{"id": rid}})
+            self.ws.send(taskstart_message)
+        else:
+            logger.warning_and_print(f'send task start message failed: no sockets connected')
 
     def on_task_done(self, task):
         print('Task completed')
+        logger.info_and_print(f'Task done: {task}')
+        rid = task.get('id')
+        filename = task.get('filename')
+        if self.ws and self.ws.sock and self.ws.sock.connected:
+            # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
+            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "filename": filename}})
+            self.ws.send(taskcomplete_message)
+        else:
+            logger.warning_and_print(f'send task done message failed: no sockets connected')
+
 
     def connect_to_manager(self):
         while self.reconnect_attempts < self.max_reconnect_attempts:

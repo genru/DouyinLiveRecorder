@@ -5,8 +5,10 @@
 然后将运行方式放在下面的方法中
 比如当直播开始录制时，进行推送
 """
+from dylr.core.room import Room
 from dylr.util import logger
 import dylr.core.record_manager
+from dylr.core import app
 
 
 def on_open(gui: bool):
@@ -33,25 +35,25 @@ def on_close():
     ...
 
 
-def on_live_start(room, filename):
+def on_live_start(room: Room, filename):
     """
     直播开始时
     :param room: 直播间
     :param filename: 录制的文件名(包含相对路径)
     """
-    global worker;
-    worker.on_task_started({id: room.id})
+    # global worker
+    app.worker.on_task_started({"id": room.room_id})
 
 
 
-def on_live_end(room, file):
+def on_live_end(room:Room, file):
     """
     直播结束时
     :param room: 直播间
     :param file: 录制的文件名，可以通过 room.record_danmu 来获取是否录制弹幕，弹幕文件名与视频名一致，但后缀名为 xml
     """
-    global worker;
-    worker.on_task_done({id: room.id, file: file})
+    # global worker
+    app.worker.on_task_done({"id": room.room_id, "filename": file})
     ...
 
 
