@@ -13,7 +13,7 @@ module.exports = {
       repo : 'git@github.com:genru/DouyinLiveRecorder.git',
       path : '/home/gp/monday-worker',
       'pre-deploy-local': '',
-      'post-deploy' : 'pip3 install -r requirement.txt && pm2 reload ecosystem.config.js --env production'
+      'post-deploy' : 'pip3 install -r requirements.txt && pm2 reload ecosystem.config.js --env production'
     }
   }
 };
