@@ -1,5 +1,5 @@
-requests~=2.28.2
-websocket-client~=1.5.1
+requests
+websocket-client
 protobuf<4.0.0
 flask
 cos-python-sdk-v5
