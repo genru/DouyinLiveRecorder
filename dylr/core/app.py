@@ -63,23 +63,7 @@ def init(gui_mode: bool):
     worker = Worker('client 1', 'ws://localhost:8080')
     worker.start()
 
-    if gui_mode:
-        t = threading.Thread(target=monitor.init)
-        threads.append(t)
-        t.start()
-        start_gui()
-    else:
-        monitor.init()
-
-
-def start_gui():
-    global stop_all_threads
-    from dylr.gui import app_win
-    app_win.ApplicationWin()
-    # GUI被关闭时，继续往下运行
-    stop_all_threads = True
-    logger.info_and_print('GUI closed')
-    plugin.on_close()
+    monitor.init()
 
 
 def sigint_handler(signum, frame):
@@ -137,11 +121,4 @@ def check_dependencies():
     if not has_flask:
         res.append('flask')
 
-    if win_mode:
-        if sys.platform == 'win32':
-            os.system(f'start cmd /C "chcp 65001 & '
-                      f'echo 缺少依赖{res}，请运行(安装依赖.bat)或运行命令(python -m pip install -r requirements.txt) & '
-                      f'pause"')
-        else:
-            print(f'echo 缺少依赖{res}，请运行(安装依赖.bat)或运行命令(python -m pip install -r requirements.txt)')
     return False

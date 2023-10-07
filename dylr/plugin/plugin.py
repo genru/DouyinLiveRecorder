@@ -5,8 +5,11 @@
 然后将运行方式放在下面的方法中
 比如当直播开始录制时，进行推送
 """
+import os
+import time
 from dylr.core.room import Room
-from dylr.util import logger
+from dylr.util import logger, cloudstore
+# from dylr.util import cloudstore
 import dylr.core.record_manager
 from dylr.core import app
 
@@ -35,25 +38,38 @@ def on_close():
     ...
 
 
-def on_live_start(room: Room, filename):
+def on_live_start(room: Room, filename, title=None):
     """
     直播开始时
     :param room: 直播间
     :param filename: 录制的文件名(包含相对路径)
     """
+    logger.info_and_print(f'on_live_start {room} {filename} "{title}"')
     # global worker
-    app.worker.on_task_started({"id": room.room_id})
+    app.worker.on_task_started({"id": room.room_id, "title": title})
 
 
-
-def on_live_end(room:Room, file):
+def on_live_end(room:Room, file, title=None):
     """
     直播结束时
     :param room: 直播间
     :param file: 录制的文件名，可以通过 room.record_danmu 来获取是否录制弹幕，弹幕文件名与视频名一致，但后缀名为 xml
     """
+    logger.info_and_print(f"on_live_end: {room} {file} '{title}'")
+
     # global worker
-    app.worker.on_task_done({"id": room.room_id, "filename": file})
+    now = time.localtime()
+    now_str = time.strftime('%Y%m%d_%H%M%S', now)
+    key = f"{room.room_id}/{now_str}.flv"
+    cloudstore.save_object(room.room_id, file, key, title, on_live_uploaded)
+    ...
+
+def on_live_uploaded(room_id, title, url, filename):
+    logger.debug_and_print(f'on_live_uploaded {room_id} "{title}" <{url}> {filename}')
+    app.worker.on_task_done({"id": room_id, "url": url, "title": title})
+    # os.delete(filename)
+    os.remove(filename)
+    # TODO: report live record
     ...
 
 

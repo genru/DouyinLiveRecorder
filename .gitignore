@@ -8,3 +8,5 @@
 forum.MD
 rooms.json
 rooms - bak.json
+.DS_store
+.env

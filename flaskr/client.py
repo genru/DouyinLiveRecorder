@@ -3,14 +3,14 @@ import websocket
 import threading
 import json
 import time
-from dylr.core import add_room_manager, app
+from dylr.core import add_room_manager, config, record_manager
 from dylr.util import logger
 
 class Worker:
     def __init__(self, name, server_url, max_task_limit=10):
         self.name = name
         self.server_url = server_url
-        self.tasks = []
+        self.tasks = [ {"id": room.room_id, "name": room.room_name} for room in record_manager.rooms]
         self.max_task_limit = max_task_limit
         self.heartbeat_interval = 35
         self.reconnect_interval = 10  # Reconnection interval in seconds
@@ -40,6 +40,10 @@ class Worker:
             if task:
                 self.add_task(task)
                 # Handle the task here as needed
+        if message_type == 'task_remove':
+            task = parsed_message.get('task')
+            if task:
+                self.remove_task(task)
 
     def on_close(self, ws, close_status_code, close_msg):
         print(f'WebSocket connection closed with status code {close_status_code}: {close_msg}')
@@ -54,6 +58,8 @@ class Worker:
     def send_heartbeat(self):
         while True:
             if self.ws and self.ws.sock and self.ws.sock.connected:
+                # tasks should be identical record_manager.rooms
+                self.tasks = [ {"id": room.room_id, "name": room.room_name} for room in record_manager.rooms]
                 # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
                 heartbeat_message = json.dumps({'type': 'heartbeat', 'tasks': self.tasks, 'work_load': len(self.tasks)/self.max_task_limit})
                 self.ws.send(heartbeat_message)
@@ -78,6 +84,17 @@ class Worker:
         else:
             print(f'Task queue is full. Task "{task}" not added.')
 
+    def remove_task(self, task):
+        print('Removing task '+task.get('id'))
+        # self.tasks.remove(task)
+
+        newTasks = [t for t in self.tasks if t.get('id')!=task.get('id')]
+        self.tasks = newTasks
+        for index, item in enumerate(record_manager.rooms):
+            if item.room_id == task.get('id'):
+                record_manager.rooms.remove(item)
+                config.save_rooms()
+
     def on_task_started(self, task):
         # print(f'Task started: {task}')
         logger.info_and_print(f'Task started: {task}')
@@ -94,10 +111,11 @@ class Worker:
         print('Task completed')
         logger.info_and_print(f'Task done: {task}')
         rid = task.get('id')
-        filename = task.get('filename')
+        url = task.get('url')
+        title = task.get('title')
         if self.ws and self.ws.sock and self.ws.sock.connected:
             # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
-            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "filename": filename}})
+            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "url": url, "title":title}})
             self.ws.send(taskcomplete_message)
         else:
             logger.warning_and_print(f'send task done message failed: no sockets connected')
