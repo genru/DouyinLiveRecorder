@@ -38,33 +38,28 @@ sys.excepthook = log_uncaught_exceptions
 
 
 def info_and_print(text: str):
-    if not app.win_mode:
-        print(text)
+    print(text)
     info(text)
 
 
 def debug_and_print(text: str):
     if config.debug():
-        if not app.win_mode:
-            print(text)
+        print(text)
         debug(text)
 
 
 def warning_and_print(text: str):
-    if not app.win_mode:
-        print(text)
+    print(text)
     warning(text)
 
 
 def error_and_print(text: str):
-    if not app.win_mode:
-        print(text)
+    print(text)
     error(text)
 
 
 def fatal_and_print(text: str):
-    if not app.win_mode:
-        print(text)
+    print(text)
     fatal(text)
 
 

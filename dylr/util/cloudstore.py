@@ -1,6 +1,5 @@
 import datetime
-from qcloud_cos import CosConfig
-from qcloud_cos import CosS3Client
+from qcloud_cos import CosS3Client, CosConfig, CosClientError
 import sys
 import os
 from dotenv import load_dotenv
@@ -27,18 +26,24 @@ client = CosS3Client(config)
 
 def save_object(room_id:str, filename:str, key:str, title:str, call_back_done):
     prograss_fun = make_upload_done(room_id, key, filename, title, call_back_done)
-    response = client.upload_file(
-        Bucket=bucket,
-        LocalFilePath=filename,
-        Key=key,
-        PartSize=1,
-        MAXThread=10,
-        StorageClass="STANDARD_IA",
-        EnableMD5=False,
-        progress_callback = prograss_fun
-    )
+    try:
+        response = client.upload_file(
+            Bucket=bucket,
+            LocalFilePath=filename,
+            Key=key,
+            PartSize=1,
+            MAXThread=10,
+            StorageClass="STANDARD",
+            # StorageClass="STANDARD_IA",
+            EnableMD5=False,
+            progress_callback = prograss_fun
+        )
 
-    print(f"{datetime.datetime.utcnow()}:{response['ETag']}")
+        print(f"{datetime.datetime.utcnow()}:{response['ETag']}")
+    except CosClientError as err:
+        print(f"upload_file {filename} failed")
+        call_back_done(room_id, key, title, None, filename)
+
 
 def make_upload_done(room_id, key, filename, title, upload_done):
     roomid = room_id
@@ -50,5 +55,5 @@ def make_upload_done(room_id, key, filename, title, upload_done):
     def call_back(consumed_bytes, total_bytes):
         if consumed_bytes==total_bytes:
             print(f"{datetime.datetime.utcnow()}:upload complete")
-            upload_complete(roomid, title, url, filepath)
+            upload_complete(roomid, key, title, url, filepath)
     return call_back

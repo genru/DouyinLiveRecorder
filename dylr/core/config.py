@@ -7,6 +7,7 @@
 
 import json
 import os.path
+import random
 
 from dylr.core import record_manager, app
 from dylr.core.room import Room
@@ -25,11 +26,14 @@ configs = {
     'auto_transcode_encoder': 'copy',
     'auto_transcode_bps': '0',
     'auto_transcode_delete_origin': False,
+    'worker_manager_url': 'ws://localhost:8080',
+    'worker_name': 'worker default'
 }
 
 
 def read_configs():
     global configs
+    configs['worker_name'] = generate_random_str(8);    # init default random name
     logger.info('reading configs')
     with open('config.txt', 'r', encoding='UTF-8') as f:
         lines = f.readlines()
@@ -90,8 +94,7 @@ def read_rooms() -> list:
         else:
             user_sec_id = None
         res.append(Room(room_id, room_name, auto_record, record_danmu, important, user_sec_id))
-        if not app.win_mode:
-            print(f'加载房间 {room_name}({room_id})')
+        print(f'加载房间 {room_name}({room_id})')
         logger.info(f'loaded room: {room_name}({room_id}) '
                     f'auto_record={auto_record} record_danmu={record_danmu} '
                     f'important={important} user_sec_id={user_sec_id}')
@@ -117,6 +120,13 @@ def save_rooms(rooms=None):
     with open("rooms.json", "w", encoding='utf-8') as f:
         json.dump(rooms_json, f, indent=2, ensure_ascii=False)
 
+def generate_random_str(randomlength):
+    random_str = ''
+    base_str = 'ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghigklmnopqrstuvwxyz0123456789'
+    length = len(base_str) - 1
+    for _ in range(randomlength):
+        random_str += base_str[random.randint(0, length)]
+    return random_str
 
 def debug():
     return configs['debug']
@@ -164,3 +174,9 @@ def get_auto_transcode_bps():
 
 def is_auto_transcode_delete_origin():
     return configs['auto_transcode_delete_origin']
+
+def get_worker_manager_url():
+    return configs['worker_manager_url']
+
+def get_worker_name():
+    return configs['worker_name']

@@ -31,9 +31,9 @@ def init(gui_mode: bool):
 
     win_mode = gui_mode
     # 处理 ctrl+c
-    # signal.signal(signal.SIGINT, sigint_handler)
-    # signal.signal(signal.SIGTERM, sigint_handler)
-    atexit.register(app_onexit)
+    signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGTERM, sigint_handler)
+    # atexit.register(app_onexit)
 
     if not check_dependencies():
         return
@@ -43,13 +43,11 @@ def init(gui_mode: bool):
     logger.info(f'software started. version: {version}. gui: {gui_mode}.')
     logger.info(f'platform: {platform.platform()}')
     logger.info(f'python version: {platform.python_version()}')
-    if not gui_mode:
-        if sys.platform == 'win32':
-            os.system('chcp 65001')
-        print('=' * 80)
-        print(f'Douyin Live Recorder v.{version} by Lyzen')
-        print(f'软件仅供科研数据挖掘与学习交流，因错误使用而造成的危害由使用者负责。')
-        print('=' * 80)
+
+    print('=' * 80)
+    print(f'Douyin Live Recorder v.{version} by Lyzen')
+    print(f'软件仅供科研数据挖掘与学习交流，因错误使用而造成的危害由使用者负责。')
+    print('=' * 80)
 
     config.read_configs()
     if config.debug():
@@ -60,7 +58,7 @@ def init(gui_mode: bool):
 
     """ start client """
     global worker;
-    worker = Worker('client 1', 'ws://localhost:8080')
+    worker = Worker(config.get_worker_name(), config.get_worker_manager_url())
     worker.start()
 
     monitor.init()
@@ -69,11 +67,13 @@ def init(gui_mode: bool):
 def sigint_handler(signum, frame):
     global stop_all_threads
     global threads
-    if threads is None: threads = []
+    logger.info_and_print(f'sigint thread len={len(threads)}')
+    if threads is None:
+        threads = []
     stop_all_threads = True
     logger.fatal_and_print('catched SIGINT(Ctrl+C) signal')
-    for t in threads:
-        t.join()
+    # for t in threads:
+    #     t.join()
     plugin.on_close()
 
 def app_onexit():

@@ -46,7 +46,8 @@ def on_live_start(room: Room, filename, title=None):
     """
     logger.info_and_print(f'on_live_start {room} {filename} "{title}"')
     # global worker
-    app.worker.on_task_started({"id": room.room_id, "title": title})
+    if app.worker:
+        app.worker.on_task_started({"id": room.room_id, "title": title})
 
 
 def on_live_end(room:Room, file, title=None):
@@ -64,9 +65,10 @@ def on_live_end(room:Room, file, title=None):
     cloudstore.save_object(room.room_id, file, key, title, on_live_uploaded)
     ...
 
-def on_live_uploaded(room_id, title, url, filename):
+def on_live_uploaded(room_id, key, title, url, filename):
     logger.debug_and_print(f'on_live_uploaded {room_id} "{title}" <{url}> {filename}')
-    app.worker.on_task_done({"id": room_id, "url": url, "title": title})
+    if app.worker:
+        app.worker.on_task_done({"id": room_id, "key":key,"url": url, "title": title})
     # os.delete(filename)
     os.remove(filename)
     # TODO: report live record

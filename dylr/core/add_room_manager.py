@@ -49,8 +49,6 @@ def try_add_room(info):
     except Exception:
         logger.error_and_print("添加主播失败，请确认输入的内容是否符合要求\n如果符合要求，可能是接口失效，请换种方式。")
         logger.error_and_print(traceback.format_exc())
-    if app.win_mode:
-        messagebox.askokcancel("添加主播失败", "请确认输入的内容是否符合要求\n如果符合要求，可能是接口失效，请换种方式。")
 
 
 def find_live(info):
@@ -66,8 +64,6 @@ def find_by_web_rid(web_rid):
     room = record_manager.get_room(web_rid)
     if room is not None:
         logger.error_and_print(f'重复获取主播房间: {room.room_name}({web_rid})')
-        if app.win_mode:
-            messagebox.askokcancel("房间已存在", f"重复获取主播房间: {room.room_name}({web_rid})")
         return
 
     api_url = dy_api.get_api_url(web_rid)
@@ -82,9 +78,6 @@ def find_by_web_rid(web_rid):
     config.save_rooms()
 
     logger.info_and_print(f'成功获取到房间{name}({web_rid})')
-    if app.win_mode:
-        app.win.add_room(room)
-        messagebox.askokcancel("添加主播成功", f"房间Web_Sid: {web_rid} \n 主播名: {name}")
 
     # 添加完房间立刻检查是否开播
     t = threading.Thread(target=partial(monitor.check_room, room))
@@ -102,15 +95,10 @@ def find_user(info: str):
     sec_user_id = info[info.rfind('/')+1:]
     nickname, web_rid = dy_api.get_user_info(sec_user_id)
     if nickname is None:
-        if app.win_mode:
-            messagebox.askokcancel("添加主播失败", f'无法获取{sec_user_id}的信息，请您稍后重试\n若一直不行，可能是接口已封禁，请通过其他方式添加主播')
-            return
+        return
     if web_rid is not None:
         find_by_web_rid(web_rid)
     else:
         room = Room(f"将会在开播时获取{random.randint(1, 100000000)}", nickname, True, False, False, sec_user_id)
         record_manager.rooms.append(room)
         config.save_rooms()
-        if app.win_mode:
-            app.win.add_room(room)
-            messagebox.askokcancel("添加主播成功", f'获取到主播{nickname}，但未开播。将会在开播时获取其直播间链接。')

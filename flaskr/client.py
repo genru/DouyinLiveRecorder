@@ -21,7 +21,8 @@ class Worker:
     def on_open(self, ws):
         print(f'Connected to WebSocket server at {self.server_url}')
         # Register the worker with the manager
-        registration_message = json.dumps({'type': 'register', 'name': self.name})
+        registration_message = json.dumps({'type': 'register', 'name': self.name, 'tasks': self.tasks, 'work_load': len(self.tasks)/self.max_task_limit})
+
         ws.send(registration_message)
 
         # Reset the reconnect attempt counter on successful connection
@@ -112,10 +113,11 @@ class Worker:
         logger.info_and_print(f'Task done: {task}')
         rid = task.get('id')
         url = task.get('url')
+        key = task.get('key')
         title = task.get('title')
         if self.ws and self.ws.sock and self.ws.sock.connected:
             # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
-            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "url": url, "title":title}})
+            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "url": url, "key":key, "title":title}})
             self.ws.send(taskcomplete_message)
         else:
             logger.warning_and_print(f'send task done message failed: no sockets connected')
