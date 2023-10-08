@@ -113,9 +113,10 @@ class Worker:
         url = task.get('url')
         key = task.get('key')
         title = task.get('title')
+        live_id = task.get('live_id')
         if self.ws and self.ws.sock and self.ws.sock.connected:
             # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
-            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "url": url, "key":key, "title":title}})
+            taskcomplete_message = json.dumps({'type': 'taskcomplete', 'task':{"id": rid, "url": url, "key":key, "title":title, 'live_id':live_id}})
             self.ws.send(taskcomplete_message)
         else:
             logger.warning_and_print(f'send task done message failed: no sockets connected')
