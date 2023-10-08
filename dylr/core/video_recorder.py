@@ -62,7 +62,7 @@ class VideoRecorder:
                 pass
         # 结束录制
         logger.info_and_print(f'{self.room.room_name}({self.room.room_id}) 录制结束')
-        plugin.on_live_end(self.room, filename, self.room_info.get_live_title())
+        plugin.on_live_end(self.room, filename, self.room_info)
 
         if os.path.exists(filename):
             file_size = os.stat(filename).st_size

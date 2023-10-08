@@ -34,7 +34,7 @@ class Recording:
         video_filename = f"download/{self.room.room_name}/{now_str}.flv"
 
         try:
-            plugin.on_live_start(self.room, video_filename, self.room_info.get_live_title())
+            plugin.on_live_start(self.room, video_filename, self.room_info)
         except:
             traceback.print_exc()
         self.start_recording_video(video_filename)

@@ -38,24 +38,35 @@ def on_close():
     ...
 
 
-def on_live_start(room: Room, filename, title=None):
+def on_live_start(room: Room, filename, room_info=None):
     """
     直播开始时
     :param room: 直播间
     :param filename: 录制的文件名(包含相对路径)
     """
+    title = None
+    live_id = None
+    if room_info is not None:
+        title = room_info.get_live_title()
+        live_id = room_info.get_real_room_id()
     logger.info_and_print(f'on_live_start {room.room_id} {filename} "{title}"')
     # global worker
     if app.worker:
-        app.worker.on_task_started({"id": room.room_id, "title": title})
+        app.worker.on_task_started({"id": room.room_id, "title": title, "live_id": live_id})
 
 
-def on_live_end(room:Room, file, title=None):
+def on_live_end(room:Room, file, room_info=None):
     """
     直播结束时
     :param room: 直播间
     :param file: 录制的文件名，可以通过 room.record_danmu 来获取是否录制弹幕，弹幕文件名与视频名一致，但后缀名为 xml
     """
+    title = None
+    roomId = None
+    if room_info is not None:
+        title = room_info.get_live_title()
+        roomId = room_info.get_real_room_id()
+
     logger.info_and_print(f"on_live_end: {room.room_id} {file} '{title}'")
 
     # global worker
@@ -65,10 +76,10 @@ def on_live_end(room:Room, file, title=None):
     cloudstore.save_object(room.room_id, file, key, title, on_live_uploaded)
     ...
 
-def on_live_uploaded(room_id, key, title, url, filename):
-    logger.debug_and_print(f'on_live_uploaded {room_id} "{title}" <{url}> {filename}')
+def on_live_uploaded(room_id, key, title, url, filename, live_id):
+    logger.debug_and_print(f'on_live_uploaded {room_id} "{title}" <{url}> {filename} {live_id}')
     if app.worker:
-        app.worker.on_task_done({"id": room_id, "key":key,"url": url, "title": title})
+        app.worker.on_task_done({"id": room_id, "key":key,"url": url, "title": title, "live_id":live_id})
     # os.delete(filename)
     os.remove(filename)
     # TODO: report live record

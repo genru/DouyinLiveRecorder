@@ -24,8 +24,8 @@ scheme = 'https'           # 指定使用 http/https 协议来访问 COS，默�
 config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token, Scheme=scheme)
 client = CosS3Client(config)
 
-def save_object(room_id:str, filename:str, key:str, title:str, call_back_done):
-    prograss_fun = make_upload_done(room_id, key, filename, title, call_back_done)
+def save_object(room_id:str, filename:str, key:str, title:str, call_back_done, live_id=None):
+    prograss_fun = make_upload_done(room_id, key, filename, title, call_back_done, live_id)
     try:
         response = client.upload_file(
             Bucket=bucket,
@@ -45,15 +45,16 @@ def save_object(room_id:str, filename:str, key:str, title:str, call_back_done):
         call_back_done(room_id, key, title, None, filename)
 
 
-def make_upload_done(room_id, key, filename, title, upload_done):
+def make_upload_done(room_id, key, filename, title, upload_done, live_id=None):
     roomid = room_id
     upload_complete = upload_done
     title = title
     filepath = filename
+    liveId = live_id
     url = f"https://default-1253420115.cos.ap-hongkong.myqcloud.com/{key}"
-    key = key
+    keyStr = key
     def call_back(consumed_bytes, total_bytes):
         if consumed_bytes==total_bytes:
             print(f"{datetime.datetime.utcnow()}:upload complete")
-            upload_complete(roomid, key, title, url, filepath)
+            upload_complete(roomid, keyStr, title, url, filepath, liveId)
     return call_back
