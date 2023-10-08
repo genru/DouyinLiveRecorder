@@ -168,6 +168,6 @@ def check_room_using_api(room):
         return
     room_info = RoomInfo(room, room_json)
     if room_info.is_going_on_live():
-        logger.info_and_print(f'检测到 {room.room_name}({room.room_id}) 开始直播，启动录制。')
+        logger.info_and_print(f'检测到 {room.room_name}({room.room_id}, {room_info.get_real_room_id()}) 开始直播，启动录制。')
 
         record_manager.start_recording(room, room_info)

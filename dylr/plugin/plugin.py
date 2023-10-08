@@ -44,7 +44,7 @@ def on_live_start(room: Room, filename, title=None):
     :param room: 直播间
     :param filename: 录制的文件名(包含相对路径)
     """
-    logger.info_and_print(f'on_live_start {room} {filename} "{title}"')
+    logger.info_and_print(f'on_live_start {room.room_id} {filename} "{title}"')
     # global worker
     if app.worker:
         app.worker.on_task_started({"id": room.room_id, "title": title})
@@ -56,7 +56,7 @@ def on_live_end(room:Room, file, title=None):
     :param room: 直播间
     :param file: 录制的文件名，可以通过 room.record_danmu 来获取是否录制弹幕，弹幕文件名与视频名一致，但后缀名为 xml
     """
-    logger.info_and_print(f"on_live_end: {room} {file} '{title}'")
+    logger.info_and_print(f"on_live_end: {room.room_id} {file} '{title}'")
 
     # global worker
     now = time.localtime()
