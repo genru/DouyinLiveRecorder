@@ -24,8 +24,8 @@ scheme = 'https'           # 指定使用 http/https 协议来访问 COS，默�
 config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key, Token=token, Scheme=scheme)
 client = CosS3Client(config)
 
-def save_object(room_id:str, filename:str, key:str, title:str, call_back_done, live_id=None):
-    prograss_fun = make_upload_done(room_id, key, filename, title, call_back_done, live_id)
+def save_object(room_id:str, filename:str, key:str, title:str, live_id, call_back_done):
+    prograss_fun = make_upload_done(room_id, key, filename, title, live_id, call_back_done)
     try:
         response = client.upload_file(
             Bucket=bucket,
@@ -45,7 +45,7 @@ def save_object(room_id:str, filename:str, key:str, title:str, call_back_done, l
         call_back_done(room_id, key, title, None, filename)
 
 
-def make_upload_done(room_id, key, filename, title, upload_done, live_id=None):
+def make_upload_done(room_id, key, filename, title, live_id, upload_done):
     roomid = room_id
     upload_complete = upload_done
     title = title

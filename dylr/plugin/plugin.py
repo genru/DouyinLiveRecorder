@@ -62,10 +62,10 @@ def on_live_end(room:Room, file, room_info=None):
     :param file: 录制的文件名，可以通过 room.record_danmu 来获取是否录制弹幕，弹幕文件名与视频名一致，但后缀名为 xml
     """
     title = None
-    roomId = None
+    live_id = None
     if room_info is not None:
         title = room_info.get_live_title()
-        roomId = room_info.get_real_room_id()
+        live_id = room_info.get_real_room_id()
 
     logger.info_and_print(f"on_live_end: {room.room_id} {file} '{title}'")
 
@@ -73,7 +73,7 @@ def on_live_end(room:Room, file, room_info=None):
     now = time.localtime()
     now_str = time.strftime('%Y%m%d_%H%M%S', now)
     key = f"{room.room_id}/{now_str}.flv"
-    cloudstore.save_object(room.room_id, file, key, title, on_live_uploaded)
+    cloudstore.save_object(room.room_id, file, key, title, live_id, call_back_done=on_live_uploaded)
     ...
 
 def on_live_uploaded(room_id, key, title, url, filename, live_id):
