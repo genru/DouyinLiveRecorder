@@ -99,11 +99,9 @@ class Worker:
     def on_task_started(self, task):
         # print(f'Task started: {task}')
         logger.info_and_print(f'Task started: {task}')
-        rid = task['id']
-        # logger.info_and_print(f'Task started: {rid}')
         if self.ws and self.ws.sock and self.ws.sock.connected:
             # Prepare the heartbeat message with a task number (e.g., number of tasks in the worker's queue)
-            taskstart_message = json.dumps({'type': 'taskstart', 'task':{"id": rid}})
+            taskstart_message = json.dumps({'type': 'taskstart', 'task':task})
             self.ws.send(taskstart_message)
         else:
             logger.warning_and_print(f'send task start message failed: no sockets connected')
