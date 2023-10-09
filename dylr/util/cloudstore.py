@@ -42,7 +42,7 @@ def save_object(room_id:str, filename:str, key:str, title:str, live_id, call_bac
         print(f"{datetime.datetime.utcnow()}:{response['ETag']}")
     except CosClientError as err:
         print(f"upload_file {filename} failed {str(err)}")
-        call_back_done(room_id, key, title, None, filename)
+        call_back_done(room_id, key, title, None, filename, live_id)
 
 
 def make_upload_done(room_id, key, filename, title, live_id, upload_done):
