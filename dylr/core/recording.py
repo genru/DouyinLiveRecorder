@@ -30,8 +30,8 @@ class Recording:
             return False
 
         now = time.localtime()
-        now_str = time.strftime('%Y%m%d_%H%M%S', now)
-        video_filename = f"download/{self.room.room_name}/{now_str}.flv"
+        live_id = self.room_info.get_real_room_id()
+        video_filename = f"download/{self.room.room_name}/{live_id}.flv"
 
         try:
             plugin.on_live_start(self.room, video_filename, self.room_info)
@@ -54,8 +54,8 @@ class Recording:
             record_manager.recordings.remove(self)
             return False
         now = time.localtime()
-        now_str = time.strftime('%Y%m%d_%H%M%S', now)
-        video_filename = f"download/{self.room.room_name}/{now_str}.flv"
+        live_id = self.room_info.get_real_room_id()
+        video_filename = f"download/{self.room.room_name}/{live_id}.flv"
         self.video_recorder = None
         logger.info_and_print(f'检测到 {self.room.room_name}({self.room.room_id}) 未下播，继续录制')
         self.start_recording_video(video_filename)
