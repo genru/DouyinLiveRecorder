@@ -71,8 +71,7 @@ def on_live_end(room:Room, file, room_info=None):
 
     # global worker
     now = time.localtime()
-    now_str = time.strftime('%Y%m%d_%H%M%S', now)
-    key = f"{room.room_id}/{now_str}.flv"
+    key = f"{room.room_id}/{live_id}.flv"
     cloudstore.save_object(room.room_id, file, key, title, live_id, call_back_done=on_live_uploaded)
     ...
 
