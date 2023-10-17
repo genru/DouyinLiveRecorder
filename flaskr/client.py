@@ -91,10 +91,18 @@ class Worker:
 
         newTasks = [t for t in self.tasks if t.get('id')!=task.get('id')]
         self.tasks = newTasks
-        for index, item in enumerate(record_manager.rooms):
-            if item.room_id == task.get('id'):
-                record_manager.rooms.remove(item)
-                config.save_rooms()
+        room = record_manager.get_room(task.get('id'))
+        if room is not None:
+            # check if room is recording
+            recording = record_manager.get_recording(room)
+            if recording is not None:
+                recording.stop_recording_video()
+            record_manager.rooms.remove(room)
+            config.save_rooms()
+        # for index, item in enumerate(record_manager.rooms):
+        #     if item.room_id == task.get('id'):
+        #         record_manager.rooms.remove(item)
+        #         config.save_rooms()
 
     def on_task_started(self, task):
         # print(f'Task started: {task}')
