@@ -92,7 +92,13 @@ Windows 或 Linux 下，在软件根目录下执行指令 `python3 main.pyw`。
 下载的文件存放于 *根目录/download* 下。
 
 ### 自动转码
+安装 `ffmpeg` 参考 `https://blog.csdn.net/weixin_38261823/article/details/130537281`
 需要下载 ffmpeg，可以放在软件根目录下或其他位置，在 config.txt 中配置 ffmpeg 所在目录，并配置自动转码选项。
+
+### 提取音频
+```
+ffmpeg -i 7297559925572111142.flv -vn -ar 16000 7297559925572111142.mp3
+```
 
 ### 插件
 在 src/plugin/plugin.py 中编写你的插件，比如当直播开始时向一个 api POST 一个信息以便通知你开播了：

@@ -42,17 +42,15 @@ def transcode(filename: str):
 
     ffmpeg = FFMpegUtils()
     ffmpeg.input_file(filename)
-    output_name = filename[0:filename.rindex('.')] + '.mp4'
+    output_name = filename[0:filename.rindex('.')] + '.aac'
+    ffmpeg.set_no_video();
     ffmpeg.set_output_name(output_name)
     ffmpeg.force_override()
-    ffmpeg.set_video_codec(config.get_auto_transcode_encoder())
-    if len(config.get_auto_transcode_bps()) > 0:
-        ffmpeg.set_bit_rate(config.get_auto_transcode_bps())
     ffmpeg.set_audio_codec('copy')
     command = ffmpeg.generate()
     if len(config.get_ffmpeg_path()) > 0:
         command = config.get_ffmpeg_path() + '/' + command
-    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
     if config.is_auto_transcode_delete_origin():
         os.remove(filename)
     logger.info_and_print(f'{output_name} 转码完成')
@@ -65,6 +63,6 @@ def ffmpeg_bin_exist():
         ffmpeg_cmd = config.get_ffmpeg_path() + "/ffmpeg -version"
     else:
         ffmpeg_cmd = "ffmpeg -version"
-    r = subprocess.run(ffmpeg_cmd, capture_output=True)
-    info = str(r.stderr, "UTF-8")
+    r = subprocess.run(ffmpeg_cmd, capture_output=True, shell=True)
+    info = str(r.stdout, "UTF-8")
     return 'version' in info
