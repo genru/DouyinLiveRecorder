@@ -10,23 +10,25 @@ import subprocess
 import threading
 from threading import Thread
 
-from dylr.core import config, app
+from dylr.core import config, app, room, room_info
 from dylr.util import logger
 from dylr.util.ffmpeg_utils import FFMpegUtils
+from dylr.plugin import plugin
+
 
 
 # 同时只能有一个项目在转码，防止资源占用过高
 lock = threading.Lock()
 
 
-def start_transcode(filename: str):
+def start_transcode(room: room.Room, filename: str, room_info: room_info.RoomInfo):
     logger.info_and_print(f'已将 {filename} 加入转码队列')
-    t = Thread(target=transcode, args=(filename,))
+    t = Thread(target=transcode, args=(filename,room, room_info))
     app.threads.append(t)
     t.start()
 
 
-def transcode(filename: str):
+def transcode(filename: str, room: room.Room, room_info:room_info.RoomInfo):
     lock.acquire()
 
     if not ffmpeg_bin_exist():
@@ -54,7 +56,7 @@ def transcode(filename: str):
     if config.is_auto_transcode_delete_origin():
         os.remove(filename)
     logger.info_and_print(f'{output_name} 转码完成')
-
+    plugin.on_live_transcoded(room, output_name, room_info)
     lock.release()
 
 

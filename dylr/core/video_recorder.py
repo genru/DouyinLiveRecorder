@@ -78,7 +78,7 @@ class VideoRecorder:
 
         # 自动转码
         if config.is_auto_transcode():
-            transcode_manager.start_transcode(filename)
+            transcode_manager.start_transcode(self.room,filename, self.room_info)
 
         # 再次检测是否在直播，防止因网络问题造成的提前停止录制
         # 如果是主动停止录制，则不立刻再次检查

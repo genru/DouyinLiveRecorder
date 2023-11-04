@@ -55,23 +55,38 @@ def on_live_start(room: Room, filename, room_info=None):
         app.worker.on_task_started({"id": room.room_id, "title": title, "live_id": live_id})
 
 
-def on_live_end(room:Room, file, room_info=None):
+def on_live_end(room: Room, file, room_info=None):
     """
     直播结束时
     :param room: 直播间
     :param file: 录制的文件名，可以通过 room.record_danmu 来获取是否录制弹幕，弹幕文件名与视频名一致，但后缀名为 xml
     """
+    # title = None
+    # live_id = None
+    # if room_info is not None:
+    #     title = room_info.get_live_title()
+    #     live_id = room_info.get_real_room_id()
+
+    # logger.info_and_print(f"on_live_end: {room.room_id} {file} '{title}'")
+
+    # # global worker
+    # now = time.localtime()
+    # key = f"{room.room_id}/{live_id}.flv"
+    # cloudstore.save_object(room.room_id, file, key, title, live_id, call_back_done=on_live_uploaded)
+    ...
+
+def on_live_transcoded(room: Room, file, room_info=None):
     title = None
     live_id = None
     if room_info is not None:
         title = room_info.get_live_title()
         live_id = room_info.get_real_room_id()
 
-    logger.info_and_print(f"on_live_end: {room.room_id} {file} '{title}'")
+    logger.info_and_print(f"on_live_transcoded: {room.room_id} {file} '{title}'")
 
     # global worker
-    now = time.localtime()
-    key = f"{room.room_id}/{live_id}.flv"
+    # now = time.localtime()
+    key = f"{room.room_id}/{live_id}.aac"
     cloudstore.save_object(room.room_id, file, key, title, live_id, call_back_done=on_live_uploaded)
     ...
 
