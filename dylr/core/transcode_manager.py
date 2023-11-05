@@ -7,6 +7,7 @@
 
 import os
 import subprocess
+import sys
 import threading
 from threading import Thread
 
@@ -65,6 +66,9 @@ def ffmpeg_bin_exist():
         ffmpeg_cmd = config.get_ffmpeg_path() + "/ffmpeg -version"
     else:
         ffmpeg_cmd = "ffmpeg -version"
-    r = subprocess.run(ffmpeg_cmd, capture_output=True, shell=True)
+    if sys.version_info >= (3,7):
+        r = subprocess.run(ffmpeg_cmd, capture_output=True, shell=True)
+    else:
+        r = subprocess.run(ffmpeg_cmd, stdout = subprocess.PIPE, shell=True)
     info = str(r.stdout, "UTF-8")
     return 'version' in info
